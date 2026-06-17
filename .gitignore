@@ -1,7 +1,6 @@
-.venv
-config/.env
-config/db.sqlite3
-config/finance_planner/__pycache__
-config/planner/__pycache__
-config/planner/migrations/__pycache__
+.venv/
+db.sqlite3
+__pycache__/
+*.pyc
+.env
 staticfiles/
