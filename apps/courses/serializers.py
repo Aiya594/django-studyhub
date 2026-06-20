@@ -35,3 +35,48 @@ class CourseSerializer(serializers.ModelSerializer):
         if len(descrip)<10:
             raise serializers.ValidationError("Description must contain at least 10 characters.")
         return descrip
+    
+    
+    
+class LessonSerializer(serializers.ModelSerializer):
+    course_title=serializers.ReadOnlyField(source='course.title')
+    
+    class Meta:
+        model=Lesson
+        fields=[
+            'id',
+            'course_title',
+            'title',
+            'content',
+            'order',
+            'created_at',
+            'updated_at',
+        ]
+        
+        read_only_fields=[
+            'id',
+            'course_title',
+            'created_at',
+            'updated_at',
+        ]
+        
+    def validate(self, attrs):
+        view = self.context.get("view")
+        course_id = view.kwargs.get("course_id")
+
+        title = attrs.get("title")
+        order = attrs.get("order")
+
+        lessons = Lesson.objects.filter(course_id=course_id)
+
+        if lessons.filter(title=title).exists():
+            raise serializers.ValidationError({
+            "title": "Lesson with this title already exists in this course."
+        })
+
+        if lessons.filter(order=order).exists():
+            raise serializers.ValidationError({
+            "order": "Lesson with this order already exists in this course."
+        })
+
+        return attrs

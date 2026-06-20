@@ -26,25 +26,32 @@ class Course(models.Model):
     def __str__(self):
         return self.title
     
+class Lesson(models.Model):
+    course=models.ForeignKey(Course,on_delete=models.CASCADE,related_name='lessons')
+    title=models.CharField(max_length=255)
+    content=models.TextField()
+    order=models.PositiveIntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        db_table='lessons'
+        ordering=['order']
+        constraints = [
+            models.UniqueConstraint(
+                fields=['order','course'],
+                name='unique_order_num_per_course'
+            ),
+            models.UniqueConstraint(
+                fields=['course', 'title'],
+                name='unique_lesson_title_per_course')]
+
+    
+
     
     
 """
-Course : {
-    owner - fk(customUser)
-    title
-    description
-    difficulty (beginner,intermediate,advanced)
-    created_at
-    updated_at
-    }
-Lesson: {
-    course - fk(course)
-    title
-    content
-    order
-    created_at
-    updated_at
-    }
+
 Enrollment  : {
     student - fk(users)
     course - fk(course)
