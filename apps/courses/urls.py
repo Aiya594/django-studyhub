@@ -1,5 +1,13 @@
 from rest_framework.routers import DefaultRouter
-from .views import CourseViewSet,LessonViewSet
+from django.urls import path
+
+from .views import (
+    CourseViewSet,
+    LessonViewSet,
+    EnrollmentListCreateView,
+    EnrollmentDestroyView,
+)
+
 
 router = DefaultRouter()
 router.register(
@@ -15,4 +23,17 @@ router.register(
 )
 
 
-urlpatterns = router.urls
+urlpatterns = [
+    path(
+        "enrollments/",
+        EnrollmentListCreateView.as_view(),
+        name="enrollment-list-create"
+    ),
+    path(
+        "enrollments/<int:pk>/",
+        EnrollmentDestroyView.as_view(),
+        name="enrollment-delete"
+    ),
+]
+
+urlpatterns += router.urls

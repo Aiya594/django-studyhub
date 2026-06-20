@@ -80,3 +80,45 @@ class LessonSerializer(serializers.ModelSerializer):
         })
 
         return attrs
+    
+    
+class EnrollmentSerializer(serializers.ModelSerializer):
+    student_name=serializers.ReadOnlyField(source='student.username')
+    course_title=serializers.ReadOnlyField(source='course.title')
+
+    class Meta:
+        model=Enrollment
+        fields=[
+            'id',
+            'course_title',
+            'course',
+            'student',
+            'student_name',
+            'created_at',
+        ]
+        read_only_fields=[
+            "id",
+            "student",
+            "student_name",
+            "course_title",
+            "created_at",
+        ]
+        
+    def validate(self, attrs):
+        request = self.context.get("request")
+        user = request.user
+        course = attrs.get("course")
+
+        if course.owner == user:
+            raise serializers.ValidationError({
+                "course": "You cannot enroll in your own course."
+            })
+
+        if Enrollment.objects.filter(student=user, course=course).exists():
+            raise serializers.ValidationError({
+                "course": "You are already enrolled in this course."
+            })
+
+        return attrs
+    
+    

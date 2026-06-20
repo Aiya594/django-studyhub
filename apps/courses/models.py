@@ -47,16 +47,25 @@ class Lesson(models.Model):
                 name='unique_lesson_title_per_course')]
 
     
+class Enrollment(models.Model):
+    student=models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE,related_name='enrollments')
+    course=models.ForeignKey(Course,on_delete=models.CASCADE,related_name='enrollments')
+    created_at = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        db_table='enrollments'
+        constraints = [
+            models.UniqueConstraint(
+                fields=["student", "course"],
+                name="unique_student_course_enrollment"
+            )]
+
+    def __str__(self):
+        return f"{self.student} enrolled in {self.course}"
     
     
 """
 
-Enrollment  : {
-    student - fk(users)
-    course - fk(course)
-    created_at
-    }
 Assignment : {
     lesson - fk(lesson)
     title
